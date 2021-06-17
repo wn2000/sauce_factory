@@ -27,6 +27,7 @@ cart_saving_size=4M
 
 mkdir -p "$workdir/data"
 cp -R "$inputdir"/* "$workdir/data/"
+mkdir -p "$workdir/data/save"
 
 find "$workdir/data" -name "*.lnk" -type f -print0 | xargs -0 -n1 ./resolve.sh
 find "$workdir/data" -name "*.lnk" -type f -delete
@@ -38,7 +39,7 @@ chmod 755 "$workdir/data/exec.sh"
 # /bin/rm -f "$1"/boxart/boxart.*
 # /bin/mv boxart_resized.png "$1"/boxart/boxart.png
 
-#$(cd "$1" && rm -f title.png && ln -sf boxart/boxart.png title.png)
+$(cd "$workdir/data" && rm -f title.png && ln -sf boxart/boxart.png title.png)
 
 mksquashfs "$workdir/data" $cart_tmp_file -b 262144 -root-owned -nopad
  
