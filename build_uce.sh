@@ -15,6 +15,8 @@ mkdir -p out
 
 workdir=$(mktemp -d)
 trap "rm -R $workdir" 0 2 3 15
+
+export BASEDIR="$PWD"
  
 cart_tmp_file="$workdir/byog_cartridge_shfs_temp.img"
 cart_save_file="$workdir/byog_cart_saving_ext4.img"
