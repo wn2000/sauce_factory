@@ -43,6 +43,11 @@ chmod 755 "$workdir/data/exec.sh"
 
 $(cd "$workdir/data" && rm -f title.png && ln -sf boxart/boxart.png title.png)
 
+if [ -f "$workdir/data/save.zip" ]
+then
+  /bin/mv "$workdir/data/save.zip" "$workdir/"
+fi
+
 mksquashfs "$workdir/data" $cart_tmp_file -b 262144 -root-owned -nopad
  
 SQIMGFILESIZE=$(stat -c%s "$cart_tmp_file")
@@ -102,6 +107,12 @@ filesize=$(stat -c%s "$cart_save_file")
 echo "*** Size of $cart_save_file: $filesize Bytes (save partition)"
 
 #bind files together
+if [ -f "$workdir/save.zip" ]
+then
+  unzip "$workdir/save.zip" -d "$workdir"
+  /bin/mv "$workdir/save.bin" $cart_save_file
+fi
+
 cat $cart_tmp_file $cart_save_file > "$cart_file"
 
 filesize=$(stat -c%s "$cart_file")
