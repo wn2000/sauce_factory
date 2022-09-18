@@ -10,9 +10,10 @@ fi
 
 echo resolving link $lnkfile
 
-folder=$(dirname $lnkfile)
-actualfile=$(eval echo $(cat $lnkfile))
+folder="$(dirname "$lnkfile")"
+echo $folder
 
+eval actualfile=\"$(cat $lnkfile)\"
 
 if [ -f "$actualfile" ]; then
   cp "$actualfile" $folder

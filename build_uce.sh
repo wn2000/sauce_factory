@@ -28,8 +28,26 @@ cart_saving_size=4M
 /bin/rm -f $cart_save_file
 
 mkdir -p "$workdir/data"
-cp -R "$inputdir"/* "$workdir/data/"
+rsync -a "$inputdir"/ "$workdir/data/"
+
+# create the save partition
+mkdir -p "$workdir/save/upper"
+mkdir -p "$workdir/save/work"
+
+if [ -d "$workdir/data/save" ]; then
+  # find "$workdir/data/save" -type f -exec chmod 666 {} \;
+  find "$workdir/data/save" -type d -exec chmod 777 {} \;
+  find "$workdir/data/save" -type f -exec chmod a+rw {} \;
+
+  #/bin/mv "$workdir/data/save"/* "$workdir/save/upper"
+  rsync -a "$workdir/data/save"/ "$workdir/save/upper"/
+  /bin/rm -rf "$workdir/data/save"
+fi
+
 mkdir -p "$workdir/data/save"
+
+truncate -s $cart_saving_size $cart_save_file
+mkfs.ext4 -d "$workdir/save" $cart_save_file
 
 find "$workdir/data" -name "*.lnk" -type f -print0 | xargs -0 -n1 ./resolve.sh
 find "$workdir/data" -name "*.lnk" -type f -delete
@@ -87,11 +105,6 @@ filesize=$(stat -c%s "$cart_tmp_file")
 echo "*** Size of $cart_tmp_file: $filesize Bytes (after padding zeros)"
  
 /bin/rm -f $my_md5string_hex_file
- 
-truncate -s $cart_saving_size $cart_save_file
-mkfs.ext4 $cart_save_file
-debugfs -R 'mkdir upper' -w $cart_save_file
-debugfs -R 'mkdir work' -w $cart_save_file
  
 md5=$(md5sum "$cart_save_file" | cut -d ' '  -f 1)
 echo "*** Ext4 Partition MD5 Hash: "$md5""
