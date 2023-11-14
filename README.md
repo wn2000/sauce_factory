@@ -16,8 +16,11 @@ Scripts and tools to automate saUCE cooking.
 - Build  
   - To build a single sauce, type  
     `make out/Sauce_Name.uce`
+
     e.g.  
+
     `make out/AddOn_Air_Rescue.uce`
+
     This would generates `AddOn_Air_Rescue.uce` in the `out` folder.
 
     *Note:* Currently this does not work if the recipe folder contains files with space in their names.
