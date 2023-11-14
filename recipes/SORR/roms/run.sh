@@ -1,21 +1,27 @@
 echo script started on `date`.
 
+UCE_PATH=$(tr -d '\0' < /sys/block/loop1/loop/backing_file)
+UCE_DIR=$(dirname -- "$UCE_PATH")
+UCE_DIR_ON_USB=${UCE_DIR#/media/usb[0-9]}
+UCE_NAME=$(basename -- "$UCE_PATH")
+UCE_NAME="${UCE_NAME%.*}"
+echo UCE_DIR: $UCE_DIR
+echo UCE_NAME: $UCE_NAME
+
 model=$(tr -d '\0' < /proc/device-tree/model)
 echo Model: $model
 
 export AUDIODEV="hw:2,0"
-export SDL_GAMECONTROLLERCONFIG_FILE="/malibu/CarbonClient/Mas/gamecontrollerdb.txt"
-UCE_DIR=$(dirname "$UCE_NAME")
-for ((i=0; i<=9; i++))
-do
-  filename="/media/usb${i}/${UCE_DIR}/gamecontrollerdb.txt"
-  echo trying $filename
-  if [ -f "$filename" ]; then
-      echo using $filename
-      export SDL_GAMECONTROLLERCONFIG_FILE="$filename"
-      break
-  fi
-done
+if [ -f "$UCE_DIR/gamecontrollerdb_$model.txt" ]; then
+  export SDL_GAMECONTROLLERCONFIG_FILE="$UCE_DIR/gamecontrollerdb_$model.txt"
+elif [ -f "$UCE_DIR/gamecontrollerdb.txt" ]; then
+  export SDL_GAMECONTROLLERCONFIG_FILE="$UCE_DIR/gamecontrollerdb.txt"
+elif [ -f "/userdata/customer_controller_db_3rd.txt" ]; then
+  export SDL_GAMECONTROLLERCONFIG_FILE="/userdata/customer_controller_db_3rd.txt"
+elif [ -f "/malibu/CarbonClient/Mas/gamecontrollerdb.txt" ]; then
+  export SDL_GAMECONTROLLERCONFIG_FILE="/malibu/CarbonClient/Mas/gamecontrollerdb.txt"
+fi
+echo SDL_GAMECONTROLLERCONFIG_FILE: $SDL_GAMECONTROLLERCONFIG_FILE
 
 cp emu/fs/usr/lib/ld-linux-armhf.so.3 /tmp
 mkdir -p /tmp/fs/usr/lib /tmp/fs/usr/bin
